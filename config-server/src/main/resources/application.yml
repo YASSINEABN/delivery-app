@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: config-server
+  
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/your-org/delivery-app-config.git
+          clone-on-start: true
+          default-label: main
+          # Uncomment if authentication is required
+          # username: ${GIT_USERNAME}
+          # password: ${GIT_PASSWORD}
+
+server:
+  port: 8888
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.config: INFO

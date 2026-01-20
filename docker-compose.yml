@@ -1,0 +1,213 @@
+version: '3.8'
+
+services:
+  # Service Registry (Eureka Server) - Must start first
+  service-registry:
+    image: delivery-app/service-registry:latest
+    container_name: delivery-service-registry
+    build:
+      context: ./service-registry
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - delivery-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # Config Server - Starts after service registry
+  config-server:
+    image: delivery-app/config-server:latest
+    container_name: delivery-config-server
+    build:
+      context: ./config-server
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    networks:
+      - delivery-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka/
+    depends_on:
+      service-registry:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # Order Service
+  order-service:
+    image: delivery-app/order-service:latest
+    container_name: delivery-order-service
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    networks:
+      - delivery-network
+    volumes:
+      - ./order-service/database:/app/database
+      - order-data:/app/data
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: on-failure
+
+  # Delivery Service
+  delivery-service:
+    image: delivery-app/delivery-service:latest
+    container_name: delivery-delivery-service
+    build:
+      context: ./delivery-service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    networks:
+      - delivery-network
+    volumes:
+      - ./delivery-service/database:/app/database
+      - delivery-data:/app/data
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: on-failure
+
+  # Deliverer Service
+  deliverer-service:
+    image: delivery-app/deliverer-service:latest
+    container_name: delivery-deliverer-service
+    build:
+      context: ./deliverer-service
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    networks:
+      - delivery-network
+    volumes:
+      - ./deliverer-service/database:/app/database
+      - deliverer-data:/app/data
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: on-failure
+
+  # API Gateway - Must start last
+  api-gateway:
+    image: delivery-app/api-gateway:latest
+    container_name: delivery-api-gateway
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - delivery-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+      delivery-service:
+        condition: service_healthy
+      deliverer-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: on-failure
+
+  # RabbitMQ (Message Broker)
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: delivery-rabbitmq
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    networks:
+      - delivery-network
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin123
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+networks:
+  delivery-network:
+    driver: bridge
+    name: delivery-network
+
+volumes:
+  order-data:
+    name: delivery-order-data
+  delivery-data:
+    name: delivery-delivery-data
+  deliverer-data:
+    name: delivery-deliverer-data
+  rabbitmq-data:
+    name: delivery-rabbitmq-data

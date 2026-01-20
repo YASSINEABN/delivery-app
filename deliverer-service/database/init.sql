@@ -2,7 +2,7 @@
 -- This script creates the database and initializes it with the schema
 
 -- Execute schema creation
-.read schema.sql
+.read /app/database/schema.sql
 
 -- Insert sample data for testing (optional)
 

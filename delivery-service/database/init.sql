@@ -2,7 +2,7 @@
 -- This script creates the database and initializes it with the schema
 
 -- Execute schema creation
-.read schema.sql
+.read /app/database/schema.sql
 
 -- Insert sample data for testing (optional)
 
@@ -48,26 +48,26 @@ VALUES
     (2, 45.7750, 4.8250, 'Proche destination', 'IN_TRANSIT', '5 minutes de la destination');
 
 -- Sample delivery status history
-INSERT INTO delivery_status_history (delivery_id, status, notes, changed_by, timestamp) 
+INSERT INTO delivery_status_history (delivery_id, status, notes, changed_by) 
 VALUES 
-    (1, 'PENDING_ASSIGNMENT', 'Livraison créée', 'SYSTEM', datetime('now', '-2 hours')),
-    (1, 'ASSIGNED', 'Assignée au livreur #1', 'dispatcher@delivery.com', datetime('now', '-1 hour')),
-    (2, 'PENDING_ASSIGNMENT', 'Livraison créée', 'SYSTEM', datetime('now', '-3 hours')),
-    (2, 'ASSIGNED', 'Assignée au livreur #2', 'dispatcher@delivery.com', datetime('now', '-2 hours')),
-    (2, 'PICKED_UP', 'Colis récupéré à l\'entrepôt', 'deliverer@delivery.com', datetime('now', '-1 hour')),
-    (2, 'IN_TRANSIT', 'En route vers le client', 'deliverer@delivery.com', datetime('now', '-30 minutes')),
-    (3, 'PENDING_ASSIGNMENT', 'Livraison créée', 'SYSTEM', datetime('now', '-30 minutes'));
+    (1, 'PENDING_ASSIGNMENT', 'Livraison créée', 'SYSTEM'),
+    (1, 'ASSIGNED', 'Assignée au livreur #1', 'dispatcher@delivery.com'),
+    (2, 'PENDING_ASSIGNMENT', 'Livraison créée', 'SYSTEM'),
+    (2, 'ASSIGNED', 'Assignée au livreur #2', 'dispatcher@delivery.com'),
+    (2, 'PICKED_UP', 'Colis récupéré à l''entrepôt', 'deliverer@delivery.com'),
+    (2, 'IN_TRANSIT', 'En route vers le client', 'deliverer@delivery.com'),
+    (3, 'PENDING_ASSIGNMENT', 'Livraison créée', 'SYSTEM');
 
 -- Sample delivery issues
-INSERT INTO delivery_issues (delivery_id, issue_type, description, resolution_status, reported_by, reported_at) 
+INSERT INTO delivery_issues (delivery_id, issue_type, description, resolution_status, reported_by) 
 VALUES 
-    (2, 'TRAFFIC', 'Embouteillages importants sur l\'Avenue Berthelot', 'IN_PROGRESS', 'deliverer@delivery.com', datetime('now', '-20 minutes'));
+    (2, 'TRAFFIC', 'Embouteillages importants sur l''Avenue Berthelot', 'IN_PROGRESS', 'deliverer@delivery.com');
 
 -- Sample delivery notifications
-INSERT INTO delivery_notifications (delivery_id, recipient_type, recipient_id, notification_type, message, sent_status, sent_at) 
+INSERT INTO delivery_notifications (delivery_id, recipient_type, recipient_id, notification_type, message, sent_status) 
 VALUES 
-    (1, 'CUSTOMER', '1', 'ASSIGNED', 'Votre commande a été assignée à un livreur', 'SENT', datetime('now', '-1 hour')),
-    (1, 'DELIVERER', '1', 'ASSIGNED', 'Nouvelle livraison assignée: DEL-2026-0001', 'SENT', datetime('now', '-1 hour')),
-    (2, 'CUSTOMER', '2', 'PICKED_UP', 'Votre commande a été récupérée et est en route', 'SENT', datetime('now', '-1 hour')),
-    (2, 'CUSTOMER', '2', 'IN_TRANSIT', 'Votre livreur est en chemin', 'SENT', datetime('now', '-30 minutes')),
-    (3, 'ADMIN', 'admin', 'URGENT', 'Livraison urgente en attente d\'assignation', 'PENDING', NULL);
+    (1, 'CUSTOMER', '1', 'ASSIGNED', 'Votre commande a été assignée à un livreur', 'SENT'),
+    (1, 'DELIVERER', '1', 'ASSIGNED', 'Nouvelle livraison assignée: DEL-2026-0001', 'SENT'),
+    (2, 'CUSTOMER', '2', 'PICKED_UP', 'Votre commande a été récupérée et est en route', 'SENT'),
+    (2, 'CUSTOMER', '2', 'IN_TRANSIT', 'Votre livreur est en chemin', 'SENT'),
+    (3, 'ADMIN', 'admin', 'URGENT', 'Livraison urgente en attente d''assignation', 'PENDING');

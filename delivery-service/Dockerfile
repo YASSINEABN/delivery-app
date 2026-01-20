@@ -25,13 +25,10 @@ COPY --from=build /app/target/*.jar app.jar
 # Copy database scripts
 COPY database ./database
 
-# Create database directory
-RUN mkdir -p /app/data
-
-# Initialize database
-RUN chmod +x /app/database/create_db.sh && \
+# Create database directory and initialize database
+RUN mkdir -p /app/data && \
     cd /app/data && \
-    /app/database/create_db.sh deliveries.db
+    sqlite3 deliveries.db < /app/database/init.sql
 
 # Expose port
 EXPOSE 8002

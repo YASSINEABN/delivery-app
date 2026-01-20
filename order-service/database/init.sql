@@ -2,7 +2,7 @@
 -- This script creates the database and initializes it with the schema
 
 -- Execute schema creation
-.read schema.sql
+.read /app/database/schema.sql
 
 -- Insert sample data for testing (optional)
 
@@ -25,7 +25,6 @@ INSERT INTO order_items (order_id, product_name, product_description, quantity, 
 VALUES 
     (1, 'Laptop HP', 'HP Pavilion 15.6 pouces', 1, 120.50, 120.50, 2.5, '38x25x2'),
     (2, 'Souris Sans Fil', 'Souris ergonomique Logitech', 2, 25.00, 50.00, 0.2, '10x6x4'),
-    (2, 'Clavier Mécanique', 'Clavier gaming RGB', 1, 39.99, 39.99, 0.8, '45x15x3'),
     (3, 'Moniteur 27"', 'Écran 4K Dell', 1, 224.75, 224.75, 5.5, '65x45x10');
 
 -- Sample order status history

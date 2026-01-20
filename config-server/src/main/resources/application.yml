@@ -2,16 +2,17 @@ spring:
   application:
     name: config-server
   
+  profiles:
+    active: native
+  
   cloud:
     config:
       server:
+        native:
+          search-locations: classpath:/config,file:/app/config
         git:
-          uri: https://github.com/your-org/delivery-app-config.git
-          clone-on-start: true
+          uri: file:///app/config-repo
           default-label: main
-          # Uncomment if authentication is required
-          # username: ${GIT_USERNAME}
-          # password: ${GIT_PASSWORD}
 
 server:
   port: 8888

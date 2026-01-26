@@ -1,9 +1,6 @@
 spring:
   application:
     name: config-server
-  config:
-    import: optional:configserver:
-  
   profiles:
     active: native
   

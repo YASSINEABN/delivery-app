@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # Script to create and initialize the Delivery Service database
 # Usage: ./create_db.sh [database_name]
@@ -18,15 +18,15 @@ fi
 sqlite3 "$DB_NAME" < "$SCRIPT_DIR/init.sql"
 
 if [ $? -eq 0 ]; then
-    echo "✓ Database created successfully!"
-    echo "✓ Schema initialized"
-    echo "✓ Sample data inserted"
+    echo "âœ“ Database created successfully!"
+    echo "âœ“ Schema initialized"
+    echo "âœ“ Sample data inserted"
     echo ""
     echo "Database location: $(pwd)/$DB_NAME"
     echo ""
     echo "To connect to the database, run:"
     echo "  sqlite3 $DB_NAME"
 else
-    echo "✗ Error creating database"
+    echo "âœ— Error creating database"
     exit 1
 fi

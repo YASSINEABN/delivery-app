@@ -1,6 +1,6 @@
-#!/bin/bash
+﻿#!/bin/bash
 
-# Script to stop all Docker containers for the delivery application
+# Script to stop all services for the delivery application
 # Usage: ./stop-all.sh
 
 # Color codes
@@ -14,8 +14,19 @@ echo "Stopping Delivery Application"
 echo "======================================"
 echo ""
 
+# Stop Frontend
+echo -e "${BLUE}Stopping Frontend Application...${NC}"
+if [ -f "frontend/.next-pid" ]; then
+    FRONTEND_PID=$(cat frontend/.next-pid)
+    kill $FRONTEND_PID 2>/dev/null && echo -e "${GREEN}âœ" Frontend stopped${NC}" || echo -e "${YELLOW}Frontend not running${NC}"
+    rm frontend/.next-pid
+else
+    echo -e "${YELLOW}Frontend not running${NC}"
+fi
+echo ""
+
 # Stop all containers
-echo -e "${BLUE}Stopping all containers...${NC}"
+echo -e "${BLUE}Stopping all Docker containers...${NC}"
 docker stop delivery-api-gateway 2>/dev/null || echo -e "${YELLOW}API Gateway not running${NC}"
 docker stop delivery-deliverer-service 2>/dev/null || echo -e "${YELLOW}Deliverer Service not running${NC}"
 docker stop delivery-delivery-service 2>/dev/null || echo -e "${YELLOW}Delivery Service not running${NC}"
@@ -45,3 +56,7 @@ echo ""
 
 echo "To view remaining containers:"
 echo "  docker ps -a"
+echo ""
+
+echo "To start all services again:"
+echo "  ./run-all.sh"

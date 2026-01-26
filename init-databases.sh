@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # Script to initialize all databases
 # Usage: ./init-databases.sh
@@ -21,7 +21,7 @@ cd order-service/database
 chmod +x create_db.sh
 ./create_db.sh orders.db
 cd ../..
-echo -e "${GREEN}✓ Order Service database initialized${NC}"
+echo -e "${GREEN}âœ“ Order Service database initialized${NC}"
 echo ""
 
 # Initialize Delivery Service Database
@@ -30,7 +30,7 @@ cd delivery-service/database
 chmod +x create_db.sh
 ./create_db.sh deliveries.db
 cd ../..
-echo -e "${GREEN}✓ Delivery Service database initialized${NC}"
+echo -e "${GREEN}âœ“ Delivery Service database initialized${NC}"
 echo ""
 
 # Initialize Deliverer Service Database
@@ -39,7 +39,7 @@ cd deliverer-service/database
 chmod +x create_db.sh
 ./create_db.sh deliverers.db
 cd ../..
-echo -e "${GREEN}✓ Deliverer Service database initialized${NC}"
+echo -e "${GREEN}âœ“ Deliverer Service database initialized${NC}"
 echo ""
 
 echo "======================================"

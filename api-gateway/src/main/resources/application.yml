@@ -16,18 +16,26 @@ spring:
           predicates:
             - Path=/api/orders/**
           filters:
-            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: order-service
                 fallbackUri: forward:/fallback/orders
+        
+        - id: order-service-customers
+          uri: lb://order-service
+          predicates:
+            - Path=/api/customers/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: order-service
+                fallbackUri: forward:/fallback/customers
         
         - id: delivery-service
           uri: lb://delivery-service
           predicates:
             - Path=/api/deliveries/**
           filters:
-            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: delivery-service
@@ -38,7 +46,6 @@ spring:
           predicates:
             - Path=/api/deliverers/**
           filters:
-            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: deliverer-service

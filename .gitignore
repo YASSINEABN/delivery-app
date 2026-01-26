@@ -33,6 +33,7 @@ Thumbs.db
 # Logs
 *.log
 logs/
+frontend.log
 
 # Docker
 *.tar
@@ -51,3 +52,10 @@ htmlcov/
 # Config repo (for config-server)
 config-server/config-repo/*
 !config-server/config-repo/.gitkeep
+
+# Frontend (Next.js)
+frontend/.next/
+frontend/.next-pid
+frontend/node_modules/
+frontend/out/
+frontend/.vercel

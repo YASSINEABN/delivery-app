@@ -18,7 +18,7 @@ echo ""
 echo -e "${BLUE}Stopping Frontend Application...${NC}"
 if [ -f "frontend/.next-pid" ]; then
     FRONTEND_PID=$(cat frontend/.next-pid)
-    kill $FRONTEND_PID 2>/dev/null && echo -e "${GREEN}âœ" Frontend stopped${NC}" || echo -e "${YELLOW}Frontend not running${NC}"
+    kill $FRONTEND_PID 2>/dev/null && echo -e "${GREEN}âœ Frontend stopped${NC}" || echo -e "${YELLOW}Frontend not running${NC}"
     rm frontend/.next-pid
 else
     echo -e "${YELLOW}Frontend not running${NC}"

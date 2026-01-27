@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import dynamic from 'next/dynamic';
-
-// Import ThemeToggle dynamically to avoid SSR issues
-const ThemeToggle = dynamic(() => import('./ThemeToggle'), { ssr: false });
+import ThemeToggle from './ThemeToggle';
 
 export default function Layout({ children }) {
   const router = useRouter();

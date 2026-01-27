@@ -1,7 +1,14 @@
 import { useTheme } from '../context/ThemeContext';
 
 export default function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
+
+  // Don't render until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="w-14 h-7 rounded-full bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+    );
+  }
 
   return (
     <button

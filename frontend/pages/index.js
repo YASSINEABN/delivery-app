@@ -15,16 +15,32 @@ export default function Dashboard() {
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [servicesStatus, setServicesStatus] = useState({
+    deliveries: true,
+    deliverers: true,
+  });
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
+        
+        // Check service availability
         const [customers, orders, deliveries, deliverers] = await Promise.all([
           customerAPI.getAll().catch(() => []),
           orderAPI.getAll().catch(() => []),
-          deliveryAPI.getAll().catch(() => []),
-          delivererAPI.getAll().catch(() => []),
+          deliveryAPI.getAll().catch((err) => {
+            if (err.message.includes('404')) {
+              setServicesStatus(prev => ({ ...prev, deliveries: false }));
+            }
+            return [];
+          }),
+          delivererAPI.getAll().catch((err) => {
+            if (err.message.includes('404')) {
+              setServicesStatus(prev => ({ ...prev, deliverers: false }));
+            }
+            return [];
+          }),
         ]);
 
         setStats({
@@ -142,6 +158,33 @@ export default function Dashboard() {
         <h1 className="page-title">Dashboard</h1>
         <p className="page-subtitle">Welcome back! Here's what's happening with your delivery platform today.</p>
       </div>
+
+      {/* Service Status Warning */}
+      {(!servicesStatus.deliveries || !servicesStatus.deliverers) && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4 flex items-start gap-3">
+          <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div className="flex-1">
+            <h3 className="font-semibold text-yellow-900 dark:text-yellow-100 mb-1">
+              Some services are under construction
+            </h3>
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              {!servicesStatus.deliveries && !servicesStatus.deliverers ? (
+                'Delivery and Deliverer services need REST controllers implemented.'
+              ) : !servicesStatus.deliveries ? (
+                'Delivery service needs REST controllers implemented.'
+              ) : (
+                'Deliverer service needs REST controllers implemented.'
+              )}
+              {' '}Customer and Order management are fully functional.
+            </p>
+            <Link href="/SERVICE_STATUS.md" className="text-sm font-medium text-yellow-900 dark:text-yellow-100 underline hover:text-yellow-700 dark:hover:text-yellow-300 mt-2 inline-block">
+              View implementation guide →
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

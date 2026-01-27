@@ -4,11 +4,13 @@ import { deliveryAPI } from '../../lib/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorAlert from '../../components/ErrorAlert';
 import StatusBadge from '../../components/StatusBadge';
+import ServiceNotImplemented from '../../components/ServiceNotImplemented';
 
 export default function DeliveriesList() {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [serviceNotImplemented, setServiceNotImplemented] = useState(false);
 
   useEffect(() => {
     async function fetchDeliveries() {
@@ -16,8 +18,14 @@ export default function DeliveriesList() {
         setLoading(true);
         const data = await deliveryAPI.getAll();
         setDeliveries(Array.isArray(data) ? data : []);
+        setError(null);
       } catch (err) {
-        setError(err.message);
+        // Handle 404 errors gracefully - service not yet implemented
+        if (err.message.includes('404')) {
+          setServiceNotImplemented(true);
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -45,6 +53,10 @@ export default function DeliveriesList() {
         <LoadingSpinner size="lg" />
       </div>
     );
+  }
+
+  if (serviceNotImplemented) {
+    return <ServiceNotImplemented serviceName="Delivery Service" />;
   }
 
   return (
